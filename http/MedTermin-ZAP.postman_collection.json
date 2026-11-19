@@ -1,0 +1,368 @@
+{
+  "info": {
+    "name": "MedTermin V03 - ZAP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Svi zahtjevi iz medtermin.http. Prije uvoza u ZAP postavi tokenAna i tokenLijecnik dobivene zasebnim prijavama. Kolekcija ne koristi skripte za prijenos tokena. resetToken unesi iz data/posta ako provjeravas promjenu lozinke. Zahtjevi kreiraju i otkazuju rezervacije te mijenjaju postavke. Rezervacija za ispis i otkazivanje ima izvorni ID 1."
+  },
+  "variable": [
+    {
+      "key": "host",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "tokenAna",
+      "value": "ZALIJEPI_TOKEN_ANE",
+      "type": "string"
+    },
+    {
+      "key": "tokenLijecnik",
+      "value": "ZALIJEPI_TOKEN_LIJECNIKA",
+      "type": "string"
+    },
+    {
+      "key": "resetToken",
+      "value": "TOKEN_IZ_PORUKE",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Provjera rada",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{host}}/api/health"
+      }
+    },
+    {
+      "name": "Prijava (ana)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/auth/login",
+        "body": {
+          "raw": "{\"username\": \"ana\", \"password\": \"Ana12345!\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Prijava liječnika (dr.horvat)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/auth/login",
+        "body": {
+          "raw": "{\"username\": \"dr.horvat\", \"password\": \"Ovlasteni12345!\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Podaci prijavljenog korisnika",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/ja"
+      }
+    },
+    {
+      "name": "Registracija novog korisnika",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/auth/register",
+        "body": {
+          "raw": "{\"username\": \"petra\", \"password\": \"Petra12345!\", \"email\": \"petra@primjer.hr\", \"ime\": \"Petra\", \"prezime\": \"Perić\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Liječnici sortirani po prezimenu",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/lijecnici?sort=prezime&smjer=asc"
+      }
+    },
+    {
+      "name": "Termini liječnika",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/termini?lijecnikId=1"
+      }
+    },
+    {
+      "name": "Nova rezervacija",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          },
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/rezervacije",
+        "body": {
+          "raw": "{\"terminId\": 3, \"napomena\": \"Kontrolni pregled\", \"oib\": \"48291736504\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Moje rezervacije",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/rezervacije/moje"
+      }
+    },
+    {
+      "name": "Potvrda rezervacije za ispis (HTML)",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/ispis/rezervacije/1"
+      }
+    },
+    {
+      "name": "Otkazivanje rezervacije",
+      "response": [],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/rezervacije/1"
+      }
+    },
+    {
+      "name": "Moji nalazi",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/nalazi/moji"
+      }
+    },
+    {
+      "name": "Nalaz u JSON obliku",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/nalazi/1?format=json"
+      }
+    },
+    {
+      "name": "Nalaz kao PDF",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/nalazi/1?format=pdf"
+      }
+    },
+    {
+      "name": "Preuzimanje datoteke nalaza",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/nalazi/preuzmi?datoteka=nalaz-ana-krvna-slika.txt"
+      }
+    },
+    {
+      "name": "Uvoz termina iz XML-a (dr.horvat ili admin)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "Bearer {{tokenLijecnik}}",
+            "key": "Authorization"
+          },
+          {
+            "value": "application/xml",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/termini/uvoz",
+        "body": {
+          "raw": "<termini>\n  <termin>\n    <lijecnikId>1</lijecnikId>\n    <pocetak>2026-12-01T09:00</pocetak>\n    <kapacitet>1</kapacitet>\n    <napomena>Jutarnji termin</napomena>\n  </termin>\n</termini>",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Postavke obavijesti (YAML)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          },
+          {
+            "value": "application/yaml",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/postavke",
+        "body": {
+          "raw": "podsjetnik: true\nsatiPrije: 24\nkanal: email",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Trenutne postavke obavijesti",
+      "response": [],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "value": "Bearer {{tokenAna}}",
+            "key": "Authorization"
+          }
+        ],
+        "url": "{{host}}/api/postavke"
+      }
+    },
+    {
+      "name": "Zahtjev za promjenu lozinke (poruka se zapisuje u data/posta)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/auth/reset-zahtjev",
+        "body": {
+          "raw": "{\"username\": \"ana\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Promjena lozinke tokenom iz poruke",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/json",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/api/auth/reset",
+        "body": {
+          "raw": "{\"token\": \"{{resetToken}}\", \"novaLozinka\": \"NovaLozinka123!\"}",
+          "mode": "raw"
+        }
+      }
+    },
+    {
+      "name": "Prijava obrascem (postavlja kolačić SESSION i preusmjerava)",
+      "response": [],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "value": "application/x-www-form-urlencoded",
+            "key": "Content-Type"
+          }
+        ],
+        "url": "{{host}}/prijava",
+        "body": {
+          "raw": "username=ana&password=Ana12345!&returnUrl=/",
+          "mode": "raw"
+        }
+      }
+    }
+  ]
+}
