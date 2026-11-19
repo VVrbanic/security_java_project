@@ -41,8 +41,9 @@ public class CorsFilter extends OncePerRequestFilter {
             return;
         }
         response.addHeader(HttpHeaders.VARY, HttpHeaders.ORIGIN);
-        if (dopusten(origin)) {
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+        String dopusteniOrigin = dopusteniOrigin(origin);
+        if (dopusteniOrigin != null) {
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, dopusteniOrigin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
             if (preflight) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, METODE);
@@ -58,7 +59,12 @@ public class CorsFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    private boolean dopusten(String origin) {
-        return dopusteniOrigini.contains(origin);
+    private String dopusteniOrigin(String origin) {
+        for (String kandidat : dopusteniOrigini) {
+            if (kandidat.equals(origin)) {
+                return kandidat;
+            }
+        }
+        return null;
     }
 }
