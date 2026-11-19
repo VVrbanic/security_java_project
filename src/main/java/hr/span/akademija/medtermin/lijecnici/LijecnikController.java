@@ -4,7 +4,6 @@ import hr.span.akademija.medtermin.platforma.PrijavljeniKorisnik;
 import java.util.List;
 import hr.span.akademija.medtermin.platforma.ApiException;
 import java.util.Locale;
-import java.util.Map;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +21,6 @@ public class LijecnikController {
     private static final RowMapper<Lijecnik> MAPPER = (rs, i) -> new Lijecnik(rs.getLong("id"),
             rs.getString("ime"), rs.getString("prezime"), rs.getString("specijalizacija"), rs.getString("ordinacija"));
 
-    private static final Map<String, String> STUPCI = Map.of(
-            "ime", "ime",
-            "prezime", "prezime",
-            "specijalizacija", "specijalizacija");
-
     private final JdbcTemplate jdbc;
 
     public LijecnikController(JdbcTemplate jdbc) {
@@ -38,17 +32,22 @@ public class LijecnikController {
     public List<Lijecnik> popis(@RequestParam(defaultValue = "prezime") String sort,
                                 @RequestParam(defaultValue = "asc") String smjer,
                                 PrijavljeniKorisnik korisnik) {
-        String stupac = STUPCI.get(sort);
-        String redoslijed = switch (smjer.toLowerCase(Locale.ROOT)) {
-            case "asc" -> "ASC";
-            case "desc" -> "DESC";
-            default -> null;
-        };
-        if (stupac == null || redoslijed == null) {
+        String smjerNormaliziran = smjer.toLowerCase(Locale.ROOT);
+        if (!smjerNormaliziran.equals("asc") && !smjerNormaliziran.equals("desc")) {
             throw ApiException.neispravno("Neispravan parametar sortiranja.");
         }
-        String sql = "SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY "
-                + stupac + " " + redoslijed + ", id";
-        return jdbc.query(sql, MAPPER);
+        boolean uzlazno = smjerNormaliziran.equals("asc");
+        return switch (sort) {
+            case "ime" -> uzlazno
+                    ? jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY ime ASC, id", MAPPER)
+                    : jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY ime DESC, id", MAPPER);
+            case "prezime" -> uzlazno
+                    ? jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY prezime ASC, id", MAPPER)
+                    : jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY prezime DESC, id", MAPPER);
+            case "specijalizacija" -> uzlazno
+                    ? jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY specijalizacija ASC, id", MAPPER)
+                    : jdbc.query("SELECT id, ime, prezime, specijalizacija, ordinacija FROM lijecnici ORDER BY specijalizacija DESC, id", MAPPER);
+            default -> throw ApiException.neispravno("Neispravan parametar sortiranja.");
+        };
     }
 }
